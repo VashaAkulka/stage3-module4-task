@@ -3,16 +3,21 @@ package com.mjc.school.controller.impl;
 import com.mjc.school.controller.BaseExtendController;
 import com.mjc.school.service.BaseExtendService;
 import com.mjc.school.service.dto.CommentDTO;
+import com.mjc.school.service.dto.TagDTO;
 import com.mjc.school.service.exception.NoSuchElementException;
 import com.mjc.school.service.exception.ValidationException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.LinkRelation;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -29,10 +34,43 @@ public class CommentController implements BaseExtendController<CommentDTO, Long>
 
     @Override
     @GetMapping
-    public ResponseEntity<List<CommentDTO>> readAll() {
+    public ResponseEntity<PagedModel<CommentDTO>> readAll(@RequestParam(value = "page", required = false) Integer page,
+                                                      @RequestParam(value = "sort", required = false) String sort,
+                                                      @RequestParam(value = "limit", required = false) Integer limit) {
+
         List<CommentDTO> commentDTOList = service.readAll();
-        if (commentDTOList.isEmpty()) return ResponseEntity.noContent().build();
-        else return ResponseEntity.ok(commentDTOList);
+        if (commentDTOList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            if (page == null || sort == null || limit == null) {
+                return ResponseEntity.ok(PagedModel.of(commentDTOList, new PagedModel.PageMetadata(0, 0, commentDTOList.size())));
+            }
+
+            int startIndex = (page - 1) * limit;
+            int endIndex = Math.min(startIndex + limit, commentDTOList.size());
+            List<CommentDTO> paginatedCommentDTOList = commentDTOList.subList(startIndex, endIndex);
+
+            if (sort.equals("asc")) {
+                paginatedCommentDTOList.sort(Comparator.comparing(CommentDTO::getContent));
+            } else if (sort.equals("desc")) {
+                paginatedCommentDTOList.sort(Comparator.comparing(CommentDTO::getContent).reversed());
+            }
+
+            PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(limit, page, commentDTOList.size());
+            PagedModel<CommentDTO> pagedModel = PagedModel.of(paginatedCommentDTOList, metadata);
+
+            if (endIndex < commentDTOList.size()) {
+                String nextLink = String.format("/news?page=%d&limit=%d&sort=%s", (page + 1), limit, sort);
+                pagedModel.add(Link.of(nextLink, LinkRelation.of("next")));
+            }
+
+            if (startIndex > 0) {
+                String previousLink = String.format("/news?page=%d&limit=%d&sort=%s", (page - 1), limit, sort);
+                pagedModel.add(Link.of(previousLink, LinkRelation.of("previous")));
+            }
+
+            return ResponseEntity.ok(pagedModel);
+        }
     }
 
     @Override

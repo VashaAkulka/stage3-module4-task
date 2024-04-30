@@ -3,16 +3,21 @@ package com.mjc.school.controller.impl;
 import com.mjc.school.controller.BaseExtendController;
 import com.mjc.school.service.BaseExtendService;
 import com.mjc.school.service.dto.AuthorDTO;
+import com.mjc.school.service.dto.CommentDTO;
 import com.mjc.school.service.exception.NoSuchElementException;
 import com.mjc.school.service.exception.ValidationException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.LinkRelation;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -29,10 +34,43 @@ public class AuthorController implements BaseExtendController<AuthorDTO, Long> {
 
     @Override
     @GetMapping
-    public ResponseEntity<List<AuthorDTO>> readAll() {
+    public ResponseEntity<PagedModel<AuthorDTO>> readAll(@RequestParam(value = "page", required = false) Integer page,
+                                                          @RequestParam(value = "sort", required = false) String sort,
+                                                          @RequestParam(value = "limit", required = false) Integer limit) {
+
         List<AuthorDTO> authorDTOList = service.readAll();
-        if (authorDTOList.isEmpty()) return ResponseEntity.noContent().build();
-        else return ResponseEntity.ok(authorDTOList);
+        if (authorDTOList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            if (page == null || sort == null || limit == null) {
+                return ResponseEntity.ok(PagedModel.of(authorDTOList, new PagedModel.PageMetadata(0, 0, authorDTOList.size())));
+            }
+
+            int startIndex = (page - 1) * limit;
+            int endIndex = Math.min(startIndex + limit, authorDTOList.size());
+            List<AuthorDTO> paginatedAuthorDTOList = authorDTOList.subList(startIndex, endIndex);
+
+            if (sort.equals("asc")) {
+                paginatedAuthorDTOList.sort(Comparator.comparing(AuthorDTO::getName));
+            } else if (sort.equals("desc")) {
+                paginatedAuthorDTOList.sort(Comparator.comparing(AuthorDTO::getName).reversed());
+            }
+
+            PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(limit, page, authorDTOList.size());
+            PagedModel<AuthorDTO> pagedModel = PagedModel.of(paginatedAuthorDTOList, metadata);
+
+            if (endIndex < authorDTOList.size()) {
+                String nextLink = String.format("/news?page=%d&limit=%d&sort=%s", (page + 1), limit, sort);
+                pagedModel.add(Link.of(nextLink, LinkRelation.of("next")));
+            }
+
+            if (startIndex > 0) {
+                String previousLink = String.format("/news?page=%d&limit=%d&sort=%s", (page - 1), limit, sort);
+                pagedModel.add(Link.of(previousLink, LinkRelation.of("previous")));
+            }
+
+            return ResponseEntity.ok(pagedModel);
+        }
     }
 
     @Override

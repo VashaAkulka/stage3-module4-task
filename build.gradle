@@ -23,6 +23,8 @@ subprojects {
         testImplementation "org.springframework:spring-test:$springVersion"
         implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
         implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+        implementation("org.springframework.boot:spring-boot-starter-hateoas:$springBootVersion")
+
 
         testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"

@@ -8,11 +8,16 @@ import com.mjc.school.service.exception.ValidationException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.LinkRelation;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -23,10 +28,43 @@ public class NewsController implements BaseController<NewsDTO, Long> {
 
     @Override
     @GetMapping
-    public ResponseEntity<List<NewsDTO>> readAll() {
-         List<NewsDTO> newsDTOList = service.readAll();
-         if (newsDTOList.isEmpty()) return ResponseEntity.noContent().build();
-         else return ResponseEntity.ok(newsDTOList);
+    public ResponseEntity<PagedModel<NewsDTO>> readAll(@RequestParam(value = "page", required = false) Integer page,
+                                                 @RequestParam(value = "sort", required = false) String sort,
+                                                 @RequestParam(value = "limit", required = false) Integer limit) {
+
+        List<NewsDTO> newsDTOList = service.readAll();
+        if (newsDTOList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            if (page == null || sort == null || limit == null) {
+                return ResponseEntity.ok(PagedModel.of(newsDTOList, new PagedModel.PageMetadata(0, 0, newsDTOList.size())));
+            }
+
+            int startIndex = (page - 1) * limit;
+            int endIndex = Math.min(startIndex + limit, newsDTOList.size());
+            List<NewsDTO> paginatedNewsDTOList = newsDTOList.subList(startIndex, endIndex);
+
+            if (sort.equals("asc")) {
+                paginatedNewsDTOList.sort(Comparator.comparing(NewsDTO::getTitle));
+            } else if (sort.equals("desc")) {
+                paginatedNewsDTOList.sort(Comparator.comparing(NewsDTO::getTitle).reversed());
+            }
+
+            PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(limit, page, newsDTOList.size());
+            PagedModel<NewsDTO> pagedModel = PagedModel.of(paginatedNewsDTOList, metadata);
+
+            if (endIndex < newsDTOList.size()) {
+                String nextLink = String.format("/news?page=%d&limit=%d&sort=%s", (page + 1), limit, sort);
+                pagedModel.add(Link.of(nextLink, LinkRelation.of("next")));
+            }
+
+            if (startIndex > 0) {
+                String previousLink = String.format("/news?page=%d&limit=%d&sort=%s", (page - 1), limit, sort);
+                pagedModel.add(Link.of(previousLink, LinkRelation.of("previous")));
+            }
+
+            return ResponseEntity.ok(pagedModel);
+        }
     }
 
     @Override
