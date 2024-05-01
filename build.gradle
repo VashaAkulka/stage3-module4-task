@@ -21,6 +21,7 @@ subprojects {
     dependencies {
         implementation "org.springframework:spring-context:$springVersion"
         testImplementation "org.springframework:spring-test:$springVersion"
+        testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
         implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
         implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
         implementation "org.springframework.boot:spring-boot-starter-hateoas:$springBootVersion"
@@ -38,6 +39,9 @@ subprojects {
         implementation "org.postgresql:postgresql:$postgresSQLVersion"
         implementation "org.hibernate.orm:hibernate-core:$hibernateVersion"
         implementation "org.hibernate.validator:hibernate-validator:$hibernateValidator"
+
+        testImplementation 'org.assertj:assertj-core:3.25.3'
+        testImplementation 'com.h2database:h2:2.2.224'
 
     }
     test {
