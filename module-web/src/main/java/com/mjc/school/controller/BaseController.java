@@ -11,9 +11,9 @@ public interface BaseController<R, K> {
 
     ResponseEntity<R> readById(K id) throws NoSuchElementException;
 
-    ResponseEntity<R> create(R createRequest, BindingResult bindingResult) throws ValidationException, NoSuchElementException;
+    R create(R createRequest, BindingResult bindingResult) throws ValidationException, NoSuchElementException;
 
     ResponseEntity<R> update(R updateRequest, Long id, BindingResult bindingResult) throws NoSuchElementException, ValidationException;
 
-    ResponseEntity<Boolean> deleteById(K id) throws NoSuchElementException;
+    void deleteById(K id) throws NoSuchElementException;
 }

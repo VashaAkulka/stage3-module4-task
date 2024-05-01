@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Comparator;
 import java.util.List;
@@ -84,7 +85,7 @@ public class TagController implements BaseExtendController<TagDTO, Long> {
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<TagDTO> create(@RequestBody @Valid TagDTO createRequest,
+    public TagDTO create(@RequestBody @Valid TagDTO createRequest,
                                          BindingResult bindingResult) throws ValidationException, NoSuchElementException {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult.getFieldErrors().stream()
@@ -93,7 +94,7 @@ public class TagController implements BaseExtendController<TagDTO, Long> {
                     .toString());
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(createRequest));
+        return service.create(createRequest);
     }
 
     @Override
@@ -114,12 +115,8 @@ public class TagController implements BaseExtendController<TagDTO, Long> {
     @Override
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Boolean> deleteById(@PathVariable Long id) {
-        if (service.deleteById(id)) return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body(true);
-        else return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(false);
+    public void deleteById(@PathVariable Long id) {
+        if (!service.deleteById(id))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id " + id + " not found");
     }
 }
