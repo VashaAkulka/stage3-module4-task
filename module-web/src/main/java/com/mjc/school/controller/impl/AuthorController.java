@@ -85,15 +85,8 @@ public class AuthorController implements BaseExtendController<AuthorDTO, Long> {
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthorDTO create(@RequestBody @Valid AuthorDTO createRequest,
-                                            BindingResult bindingResult) throws ValidationException, NoSuchElementException {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult.getFieldErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .toList()
-                    .toString());
-        }
-
+    public AuthorDTO create(@RequestBody @Valid AuthorDTO createRequest) throws NoSuchElementException {
+        //validation delete
         return service.create(createRequest);
     }
 

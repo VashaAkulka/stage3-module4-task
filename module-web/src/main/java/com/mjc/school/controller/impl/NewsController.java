@@ -3,6 +3,7 @@ package com.mjc.school.controller.impl;
 import com.mjc.school.controller.BaseController;
 import com.mjc.school.service.BaseService;
 import com.mjc.school.service.dto.NewsDTO;
+import com.mjc.school.service.dto.TagDTO;
 import com.mjc.school.service.exception.NoSuchElementException;
 import com.mjc.school.service.exception.ValidationException;
 import jakarta.validation.Valid;
@@ -79,15 +80,8 @@ public class NewsController implements BaseController<NewsDTO, Long> {
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public NewsDTO create(@RequestBody @Valid NewsDTO createRequest,
-                                          BindingResult bindingResult) throws ValidationException, NoSuchElementException {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult.getFieldErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .toList()
-                    .toString());
-        }
-
+    public NewsDTO create(@RequestBody @Valid NewsDTO createRequest) throws NoSuchElementException {
+        //validation delete
         return service.create(createRequest);
     }
 

@@ -2,6 +2,7 @@ package com.mjc.school.controller.impl;
 
 import com.mjc.school.controller.BaseExtendController;
 import com.mjc.school.service.BaseExtendService;
+import com.mjc.school.service.dto.AuthorDTO;
 import com.mjc.school.service.dto.CommentDTO;
 import com.mjc.school.service.dto.TagDTO;
 import com.mjc.school.service.exception.NoSuchElementException;
@@ -85,15 +86,8 @@ public class CommentController implements BaseExtendController<CommentDTO, Long>
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentDTO create(@RequestBody @Valid CommentDTO createRequest,
-                                                    BindingResult bindingResult) throws ValidationException, NoSuchElementException {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult.getFieldErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .toList()
-                    .toString());
-        }
-
+    public CommentDTO create(@RequestBody @Valid CommentDTO createRequest) throws NoSuchElementException {
+        //validation delete
         return service.create(createRequest);
     }
 
