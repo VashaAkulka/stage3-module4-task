@@ -77,6 +77,7 @@ public class NewsController implements BaseController<NewsDTO, Long> {
 
     @Override
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<NewsDTO> create(@RequestBody @Valid NewsDTO createRequest,
                                           BindingResult bindingResult) throws ValidationException, NoSuchElementException {
         if (bindingResult.hasErrors()) {
@@ -90,7 +91,7 @@ public class NewsController implements BaseController<NewsDTO, Long> {
     }
 
     @Override
-    @PatchMapping
+    @PatchMapping("/{id}")
     public ResponseEntity<NewsDTO> update(@RequestBody @Valid NewsDTO updateRequest,
                                           @PathVariable Long id,
                                           BindingResult bindingResult) throws ValidationException, NoSuchElementException {
@@ -105,7 +106,8 @@ public class NewsController implements BaseController<NewsDTO, Long> {
     }
 
     @Override
-    @DeleteMapping
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Boolean> deleteById(@PathVariable Long id) {
         if (service.deleteById(id)) return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

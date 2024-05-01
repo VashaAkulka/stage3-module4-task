@@ -83,6 +83,7 @@ public class AuthorController implements BaseExtendController<AuthorDTO, Long> {
 
     @Override
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<AuthorDTO> create(@RequestBody @Valid AuthorDTO createRequest,
                                             BindingResult bindingResult) throws ValidationException, NoSuchElementException {
         if (bindingResult.hasErrors()) {
@@ -112,6 +113,7 @@ public class AuthorController implements BaseExtendController<AuthorDTO, Long> {
 
     @Override
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Boolean> deleteById(@PathVariable Long id) {
         if (service.deleteById(id)) return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

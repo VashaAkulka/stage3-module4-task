@@ -83,6 +83,7 @@ public class CommentController implements BaseExtendController<CommentDTO, Long>
 
     @Override
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<CommentDTO> create(@RequestBody @Valid CommentDTO createRequest,
                                                     BindingResult bindingResult) throws ValidationException, NoSuchElementException {
         if (bindingResult.hasErrors()) {
@@ -96,7 +97,7 @@ public class CommentController implements BaseExtendController<CommentDTO, Long>
     }
 
     @Override
-    @PatchMapping
+    @PatchMapping("/{id}")
     public ResponseEntity<CommentDTO> update(@RequestBody @Valid CommentDTO updateRequest,
                                                     @PathVariable Long id,
                                                     BindingResult bindingResult) throws ValidationException, NoSuchElementException {
@@ -111,7 +112,8 @@ public class CommentController implements BaseExtendController<CommentDTO, Long>
     }
 
     @Override
-    @DeleteMapping
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Boolean> deleteById(@PathVariable Long id) {
         if (service.deleteById(id)) return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
