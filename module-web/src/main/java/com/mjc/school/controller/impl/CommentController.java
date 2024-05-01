@@ -8,6 +8,8 @@ import com.mjc.school.service.exception.NoSuchElementException;
 import com.mjc.school.service.exception.ValidationException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkRelation;

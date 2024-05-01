@@ -7,6 +7,8 @@ import com.mjc.school.service.exception.NoSuchElementException;
 import com.mjc.school.service.exception.ValidationException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
@@ -24,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping("/news")
 public class NewsController implements BaseController<NewsDTO, Long> {
-    BaseService<NewsDTO, Long> service;
+    private BaseService<NewsDTO, Long> service;
 
     @Override
     @GetMapping

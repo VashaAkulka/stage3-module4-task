@@ -9,6 +9,9 @@ import com.mjc.school.service.dto.TagDTO;
 import com.mjc.school.service.exception.NoSuchElementException;
 import com.mjc.school.service.mapper.TagMapper;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

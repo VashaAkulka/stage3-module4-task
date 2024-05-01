@@ -8,6 +8,9 @@ import com.mjc.school.service.dto.CommentDTO;
 import com.mjc.school.service.exception.NoSuchElementException;
 import com.mjc.school.service.mapper.CommentMapper;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
